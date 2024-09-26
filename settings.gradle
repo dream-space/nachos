@@ -1,1 +1,3 @@
-include ':app', ':nachos'
+rootProject.name = "nachos"
+include ':app'
+include ':library'

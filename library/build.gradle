@@ -1,4 +1,7 @@
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+}
 
 ext {
     bintrayRepo = 'maven'
@@ -46,6 +49,9 @@ android {
                 '--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
                 '--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED']
     }
+    lintOptions {
+        disable 'GradleDependency', 'ExpiringTargetSdkVersion'
+    }
 }
 
 dependencies {
@@ -55,5 +61,28 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.21.0'
     testImplementation('com.squareup.assertj:assertj-android:1.1.0') {
         exclude group: 'org.mockito', module: 'mockito-core'
+    }
+}
+
+afterEvaluate {
+    publishing {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/drdream-space/nachos")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") ?: System.getenv("PASSWORD")
+                }
+            }
+        }
+        publications {
+            release(MavenPublication) {
+                from components.findByName('release')
+                groupId = "dream-space"
+                artifactId = "dreamspace.nachos"
+                version = "1.3"
+            }
+        }
     }
 }
